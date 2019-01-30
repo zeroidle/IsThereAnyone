@@ -14,4 +14,5 @@ COPY --from=builder /build/main /app/
 COPY --from=builder /build/l2ping /app/
 WORKDIR /app
 EXPOSE 9801
+ENV PATH /app
 ENTRYPOINT ["/app/main"]
