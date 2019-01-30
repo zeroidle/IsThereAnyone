@@ -4,6 +4,8 @@ ENV TZ=Asia/Seoul
 RUN apk update && apk add --no-cache git
 RUN mkdir /build
 ADD . /build/
+COPY ./l2ping /build/
+RUN ls -al ./l2ping
 WORKDIR /build
 RUN go get -u github.com/go-redis/redis
 RUN go get -u github.com/gorilla/mux
