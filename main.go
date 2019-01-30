@@ -8,10 +8,11 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"strconv"
 )
 
 type Device struct {
-	code       string
+	code       int
 	name       string
 	macaddress string
 }
@@ -50,17 +51,17 @@ func GetDataFromRedis(client redis.Client) {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(dev["macaddress"])
+		fmt.Println(dev["code"])
 
+		devices = append(devices, Device{code: int(dev["code"].(float64)), name: dev["name"].(string), macaddress: dev["macaddress"].(string)})
 	}
 }
 
 func main() {
 	redisConn := ConnectRedis()
 	GetDataFromRedis(redisConn)
-
 	router := mux.NewRouter()
-	router.HandleFunc("/test/{code}", GetData).Methods("GET")
+	router.HandleFunc("/check/{code}", GetData).Methods("GET")
 
 	http.ListenAndServe(":9801", httpHandler(router))
 }
@@ -83,12 +84,14 @@ type event struct {
 func GetData(w http.ResponseWriter, r *http.Request) {
 	p := mux.Vars(r)
 	for _, i := range devices {
-		if i.code == p["code"] {
+		if strconv.Itoa(i.code) == p["code"] {
+			fmt.Println("found")
 			json.NewEncoder(w).Encode(L2ping(i.macaddress))
 
 			return
 		}
 	}
+	fmt.Println("nothing")
 	json.NewEncoder(w).Encode(&event{})
 }
 
