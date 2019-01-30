@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -a -ldflags '-w -s' -o main .
 
 FROM scratch
 COPY --from=builder /build/main /app/
-ADD l2ping /app/
+COPY --from=builder /build/l2ping /app/
 WORKDIR /app
 EXPOSE 9801
 ENTRYPOINT ["/app/main"]
