@@ -20,8 +20,8 @@ func ConnectRedis() redis.Client {
 	client := redis.NewClient(&redis.Options{
 		//Addr: RedisAddr,
 		//Password: RedisPassword, // no password set
-		Addr:     "127.0.0.1:8080",
-		Password: "password", // no password set
+		Addr:     RedisAddr,
+		Password: RedisPassword, // no password set
 
 		DB: 0, // use default DB
 	})
