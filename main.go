@@ -10,21 +10,20 @@ import (
 	"os/exec"
 )
 
-type Device struct{
-	code 		string
-	name		string
-	macaddress	string
+type Device struct {
+	code       string
+	name       string
+	macaddress string
 }
-
 
 func ConnectRedis() redis.Client {
 	client := redis.NewClient(&redis.Options{
 		//Addr: RedisAddr,
 		//Password: RedisPassword, // no password set
-		Addr: "127.0.0.1:8080",
+		Addr:     "127.0.0.1:8080",
 		Password: "password", // no password set
 
-		DB:       0,  // use default DB
+		DB: 0, // use default DB
 	})
 
 	pong, err := client.Ping().Result()
@@ -68,18 +67,16 @@ func main() {
 
 func httpHandler(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Print(r.RemoteAddr," ", r.Proto, " ", r.Method, " ", r.URL)
+		log.Print(r.RemoteAddr, " ", r.Proto, " ", r.Method, " ", r.URL)
 		handler.ServeHTTP(w, r)
 	})
 }
 
-
-
 var devices []Device
 
 type event struct {
-	code string
-	Title string
+	code        string
+	Title       string
 	Description string
 }
 
