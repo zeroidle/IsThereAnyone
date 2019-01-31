@@ -97,7 +97,7 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 
 func L2ping(mac string) bool {
 	log.Println("Checking ", mac)
-	cmd := exec.Command("echo", "-c", "1", mac)
+	cmd := exec.Command("l2ping", "-c", "1", mac)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Println(string(output), " ", err)
