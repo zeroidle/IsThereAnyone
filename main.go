@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
+	"html/template"
 	"log"
 	"net/http"
 	"os/exec"
@@ -64,6 +65,8 @@ func main() {
 	GetDataFromRedis(redisConn)
 	router := mux.NewRouter()
 	router.HandleFunc("/check/{code}", GetData).Methods("GET")
+	router.HandleFunc("/view", ViewPage).Methods("GET")
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	http.ListenAndServe(":9801", httpHandler(router))
 }
@@ -76,6 +79,11 @@ func httpHandler(handler http.Handler) http.Handler {
 }
 
 var devices []Device
+
+func ViewPage(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("static/view_page.html")
+	t.Execute(w, nil)
+}
 
 type event struct {
 	code        string
@@ -99,7 +107,7 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 
 func L2ping(mac string) bool {
 	log.Println("Checking ", mac)
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "./l2ping", "-c", "1", mac)
 	output, err := cmd.CombinedOutput()
