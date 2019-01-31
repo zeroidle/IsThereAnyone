@@ -100,7 +100,7 @@ func L2ping(mac string) bool {
 	cmd := exec.Command("echo", "-c", "1", mac)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Println(string(output))
+		log.Println(string(output), " ", err)
 		return false
 	}
 	fmt.Println(string(output))
