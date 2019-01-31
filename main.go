@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"os/exec"
 	"strconv"
+	"time"
 )
 
 type Device struct {
@@ -97,8 +99,14 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 
 func L2ping(mac string) bool {
 	log.Println("Checking ", mac)
-	cmd := exec.Command("./l2ping", "-c", "1", mac)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "./l2ping", "-c", "1", mac)
 	output, err := cmd.CombinedOutput()
+	if ctx.Err() == context.DeadlineExceeded {
+		fmt.Println("Command timed out")
+		return false
+	}
 	if err != nil {
 		log.Println(string(output), " ", err)
 		return false
