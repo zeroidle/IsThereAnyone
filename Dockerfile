@@ -9,10 +9,10 @@ RUN go get -u github.com/go-redis/redis
 RUN go get -u github.com/gorilla/mux
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -a -ldflags '-w -s' -o main .
 
-FROM golang:alpine
+FROM scratch
 COPY --from=builder /build/main /app/
 
 WORKDIR /app
 EXPOSE 9801
-ENV PATH /app
+ENV PATH="/app:$PATH"
 ENTRYPOINT ["/app/main"]
