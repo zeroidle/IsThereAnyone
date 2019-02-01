@@ -13,6 +13,8 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -a -ldflags '-w -s' -o main .
 FROM scratch
 COPY --from=builder /build/main /app/
 COPY --from=builder /build/l2ping /app/
+RUN mkdir /app/static/
+COPY --from=builder /build/static/* /app/static/
 
 WORKDIR /app
 EXPOSE 9801
