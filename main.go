@@ -96,7 +96,11 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 	for _, i := range devices {
 		if strconv.Itoa(i.code) == p["code"] {
 			fmt.Println("found")
-			json.NewEncoder(w).Encode(L2ping(i.macaddress))
+			rtnData := make(map[string]interface{})
+			rtnData["code"] = i.code
+			rtnData["result"] = L2ping(i.macaddress)
+
+			json.NewEncoder(w).Encode(rtnData)
 
 			return
 		}
