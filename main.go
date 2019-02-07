@@ -73,9 +73,8 @@ func main() {
 	redisConn := ConnectRedis()
 	GetDataFromRedis(redisConn)
 
-	for _, device := range devices {
-		//fmt.Println(reflect.TypeOf(device))
-		go Gathering(device)
+	for i := 0; i < len(devices); i++ {
+		go Gathering(i)
 	}
 	router := mux.NewRouter()
 	router.HandleFunc("/check/{code}", GetData).Methods("GET")
@@ -105,11 +104,14 @@ type event struct {
 	Description string
 }
 
-func Gathering(device Device) {
+func Gathering(pos int) {
+	device := devices[pos]
+	fmt.Println("-----------------------", device.name)
 	for ok := true; ok; ok = true {
 		result := L2ping(device.macaddress)
-		fmt.Println("scan bluetooth device ", device.name, " ", device.macaddress, " ", result)
-		device.result = result
+		devices[pos].result = result
+		fmt.Println("scan bluetooth device ", device.name, " ", device.macaddress, " ", device.result, " ", result)
+
 		time.Sleep(time.Second * 1)
 	}
 
@@ -123,6 +125,7 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 			rtnData := make(map[string]interface{})
 			rtnData["code"] = i.code
 			rtnData["result"] = i.result
+			fmt.Println(i)
 
 			json.NewEncoder(w).Encode(rtnData)
 

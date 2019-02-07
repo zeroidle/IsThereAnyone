@@ -1,16 +1,10 @@
 runtime = setInterval(function() {
     for (var ii=1; ii<4; ii++) {
-        if (ii == 4) {
-            lolo = false
-        }
-        else {
-            lolo = true
-        }
         $.ajax({
             url: '/check/' + ii,
             type: 'get',
             dataType: 'text',
-            async: lolo,
+            async: true,
             success: function (result) {
                 var data = JSON.parse(result);
                 document.getElementById("code_" + data.code).innerText = data.code + " " + data.result;
