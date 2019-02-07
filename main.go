@@ -110,9 +110,9 @@ func Gathering(pos int) {
 	for ok := true; ok; ok = true {
 		result := L2ping(device.macaddress)
 		devices[pos].result = result
-		fmt.Println("scan bluetooth device ", device.name, " ", device.macaddress, " ", device.result, " ", result)
+		fmt.Println("scan bluetooth device ", device.name, " ", device.macaddress, " ", devices[pos].result)
 
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Millisecond * 100)
 	}
 
 	fmt.Println("aa")
@@ -121,7 +121,6 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 	p := mux.Vars(r)
 	for _, i := range devices {
 		if strconv.Itoa(i.code) == p["code"] {
-			fmt.Println("found")
 			rtnData := make(map[string]interface{})
 			rtnData["code"] = i.code
 			rtnData["result"] = i.result
@@ -138,7 +137,7 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 
 func L2ping(mac string) bool {
 	log.Println("Checking ", mac)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "./l2ping", "-c", "1", mac)
 	output, err := cmd.CombinedOutput()
