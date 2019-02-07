@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"time"
 )
@@ -18,6 +19,7 @@ type Device struct {
 	code       int
 	name       string
 	macaddress string
+	result     bool
 }
 
 func ConnectRedis() redis.Client {
@@ -56,13 +58,25 @@ func GetDataFromRedis(client redis.Client) {
 		}
 		fmt.Println(dev["code"])
 
-		devices = append(devices, Device{code: int(dev["code"].(float64)), name: dev["name"].(string), macaddress: dev["macaddress"].(string)})
+		devices = append(devices, Device{
+			code:       int(dev["code"].(float64)),
+			name:       dev["name"].(string),
+			macaddress: dev["macaddress"].(string),
+			result:     false,
+		})
 	}
 }
 
 func main() {
+	runtime.GOMAXPROCS(4) // Use multi-cores
+
 	redisConn := ConnectRedis()
 	GetDataFromRedis(redisConn)
+
+	for _, device := range devices {
+		//fmt.Println(reflect.TypeOf(device))
+		go Gathering(device)
+	}
 	router := mux.NewRouter()
 	router.HandleFunc("/check/{code}", GetData).Methods("GET")
 	router.HandleFunc("/view", ViewPage).Methods("GET")
@@ -91,6 +105,16 @@ type event struct {
 	Description string
 }
 
+func Gathering(device Device) {
+	for ok := true; ok; ok = true {
+		result := L2ping(device.macaddress)
+		fmt.Println("scan bluetooth device ", device.name, " ", device.macaddress, " ", result)
+		device.result = result
+		time.Sleep(time.Second * 1)
+	}
+
+	fmt.Println("aa")
+}
 func GetData(w http.ResponseWriter, r *http.Request) {
 	p := mux.Vars(r)
 	for _, i := range devices {
@@ -98,7 +122,7 @@ func GetData(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("found")
 			rtnData := make(map[string]interface{})
 			rtnData["code"] = i.code
-			rtnData["result"] = L2ping(i.macaddress)
+			rtnData["result"] = i.result
 
 			json.NewEncoder(w).Encode(rtnData)
 
