@@ -1,4 +1,4 @@
-FROM golang:alpine as builder
+FROM i386/golang:alpine as builder
 MAINTAINER Genie.C <ygenie.chae@gmail.com>
 ENV TZ=Asia/Seoul
 RUN apk update && apk add --no-cache git alsa-utils
