@@ -14,9 +14,9 @@ FROM scratch
 COPY --from=builder /build/main /app/
 COPY --from=builder /build/l2ping /app/
 COPY --from=builder /build/static/* /app/static/
-ADD lib /lib
-ADD /usr/bin/aplay /usr/bin/aplay
-ADD /bin/bash /bin/bash
+COPY --from=builder /lib /lib
+COPY --from=builder /usr/bin/aplay /usr/bin/aplay
+COPY --from=builder /bin/bash /bin/bash
 WORKDIR /app
 EXPOSE 9801
 ENV PATH="/app:$PATH"
