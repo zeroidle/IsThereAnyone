@@ -1,4 +1,4 @@
-FROM i386/golang:alpine as builder
+FROM golang:alpine as builder
 MAINTAINER Genie.C <ygenie.chae@gmail.com>
 ENV TZ=Asia/Seoul
 RUN apk update && apk add --no-cache git alsa-utils
@@ -10,13 +10,15 @@ RUN go get -u github.com/go-redis/redis
 RUN go get -u github.com/gorilla/mux
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -a -ldflags '-w -s' -o main .
 
-FROM scratch
+FROM hypriot/rpi-alpine-scratch
+RUN apk update && \
+apk upgrade && \
+apk add bash && \
+apk add alsa-utils && \
+rm -rf /var/cache/apk/*
 COPY --from=builder /build/main /app/
 COPY --from=builder /build/l2ping /app/
 COPY --from=builder /build/static/* /app/static/
-COPY --from=builder /lib /lib
-COPY --from=builder /usr/bin/aplay /usr/bin/aplay
-COPY --from=builder /bin/sh /bin/sh
 WORKDIR /app
 EXPOSE 9801
 ENV PATH="/app:$PATH"
