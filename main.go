@@ -117,8 +117,11 @@ func Gathering(pos int) {
 
 		devices[pos].result = result
 		fmt.Println("scan bluetooth device ", device.name, " ", device.macaddress, " ", devices[pos].result)
-
-		time.Sleep(time.Millisecond * 100)
+		if result == true {
+			time.Sleep(time.Second * 10)
+		} else {
+			time.Sleep(time.Millisecond * 100)
+		}
 	}
 
 	fmt.Println("aa")
