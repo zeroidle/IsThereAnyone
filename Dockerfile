@@ -10,12 +10,7 @@ RUN go get -u github.com/go-redis/redis
 RUN go get -u github.com/gorilla/mux
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -a -ldflags '-w -s' -o main .
 
-FROM hypriot/rpi-alpine-scratch
-RUN apk update && \
-apk upgrade && \
-apk add bash && \
-apk add alsa-utils && \
-rm -rf /var/cache/apk/*
+FROM scratch
 COPY --from=builder /build/main /app/
 COPY --from=builder /build/l2ping /app/
 COPY --from=builder /build/static/* /app/static/
