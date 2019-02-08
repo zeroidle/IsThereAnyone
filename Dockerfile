@@ -8,6 +8,8 @@ RUN ls -al /build/
 WORKDIR /build
 RUN go get -u github.com/go-redis/redis
 RUN go get -u github.com/gorilla/mux
+RUN go get -u github.com/faiface/beep/speaker
+RUN go get -u github.com/faiface/beep/wav
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -a -ldflags '-w -s' -o main .
 
 FROM scratch
