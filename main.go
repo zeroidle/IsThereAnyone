@@ -3,15 +3,13 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"engo.io/audio"
 	"fmt"
-	"github.com/faiface/beep/speaker"
-	"github.com/faiface/beep/wav"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
@@ -103,10 +101,26 @@ func ViewPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func PlaySong(w http.ResponseWriter, r *http.Request) {
-	f, _ := os.Open("static/Ding-dong.wav")
-	s, format, _ := wav.Decode(f)
-	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
-	speaker.Play(s)
+	player, err := audio.NewSimplePlayer("static/Ding-dong.wav")
+	if err != nil {
+		panic(err)
+	}
+	player.Play()
+
+	fmt.Println("Volume: ", player.Volume())
+	time.Sleep(time.Second * 5)
+
+	fmt.Println("Setting Volume to: 0.2")
+	player.SetVolume(0.2)
+
+	fmt.Println("Volume: ", player.Volume())
+
+	player.Current()
+	if runtime.GOARCH != "js" {
+		for {
+			time.Sleep(time.Hour)
+		}
+	}
 }
 
 type event struct {
@@ -120,10 +134,6 @@ func Gathering(pos int) {
 	fmt.Println("-----------------------", device.name)
 	for ok := true; ok; ok = true {
 		result := L2ping(device.macaddress)
-
-		if devices[pos].result == falsresult == true {
-
-		}
 
 		devices[pos].result = result
 		fmt.Println("scan bluetooth device ", device.name, " ", device.macaddress, " ", devices[pos].result)
