@@ -120,6 +120,11 @@ func Gathering(pos int) {
 	fmt.Println("-----------------------", device.name)
 	for ok := true; ok; ok = true {
 		result := L2ping(device.macaddress)
+
+		if devices[pos].result == falsresult == true {
+
+		}
+
 		devices[pos].result = result
 		fmt.Println("scan bluetooth device ", device.name, " ", device.macaddress, " ", devices[pos].result)
 
