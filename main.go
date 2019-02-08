@@ -4,14 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/faiface/beep/speaker"
-	"github.com/faiface/beep/wav"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
@@ -103,10 +100,7 @@ func ViewPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func PlaySong(w http.ResponseWriter, r *http.Request) {
-	f, _ := os.Open("static/Ding-dong.wav")
-	s, format, _ := wav.Decode(f)
-	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
-	speaker.Play(s)
+	fmt.Println("play")
 }
 
 type event struct {
