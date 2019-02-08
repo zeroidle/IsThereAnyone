@@ -4,11 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/faiface/beep/speaker"
+	"github.com/faiface/beep/wav"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
@@ -79,6 +82,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/check/{code}", GetData).Methods("GET")
 	router.HandleFunc("/view", ViewPage).Methods("GET")
+	router.HandleFunc("/play", PlaySong).Methods("GET")
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	http.ListenAndServe(":9801", httpHandler(router))
@@ -96,6 +100,13 @@ var devices []Device
 func ViewPage(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("static/view_page.html")
 	t.Execute(w, nil)
+}
+
+func PlaySong(w http.ResponseWriter, r *http.Request) {
+	f, _ := os.Open("static/Ding-dong.wav")
+	s, format, _ := wav.Decode(f)
+	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	speaker.Play(s)
 }
 
 type event struct {
