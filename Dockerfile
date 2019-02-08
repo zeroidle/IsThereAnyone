@@ -16,7 +16,7 @@ COPY --from=builder /build/l2ping /app/
 COPY --from=builder /build/static/* /app/static/
 COPY --from=builder /lib /lib
 COPY --from=builder /usr/bin/aplay /usr/bin/aplay
-COPY --from=builder /bin/bash /bin/bash
+COPY --from=builder /bin/sh /bin/sh
 WORKDIR /app
 EXPOSE 9801
 ENV PATH="/app:$PATH"
